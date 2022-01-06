@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "heimdall.fullname" . }}
+  {{- if .Values.service.annotations }}
+  annotations:
+    {{- .Values.service.annotations | nindent 4 }}
+  {{- end }}
+  labels:
+    app: {{ template "heimdall.name" . }}
+    chart: {{ template "heimdall.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  type: ClusterIP
+  ports:
+    - name: http-rpc
+      port: {{ .Values.svc.heimdallrcp.rest }}
+      targetPort: http-rpc
+    - name: tcp
+      port: {{ .Values.svc.heimdalld.tcp }}
+      targetPort: tcp
+  selector:
+    app: {{ template "heimdall.name" . }}
+    release: {{ .Release.Name }}

@@ -1,0 +1,12 @@
+heimdall RPC can be accessed via port {{ .Values.svc.heimdallrcp.rest }} on the following DNS name from within your cluster:
+{{ template "heimdall.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local
+
+To connect to heimdall RPC:
+
+1. Forward the port for the node:
+
+  $ kubectl port-forward --namespace {{ .Release.Namespace }} $(kubectl get pods --namespace {{ .Release.Namespace }} -l "app={{ template "heimdall.name" . }},release={{ .Release.Name }}" -o jsonpath='{ .items[0].metadata.name }') {{ .Values.svc.heimdallrcp.rest }}
+
+2. Connect using the heimdall cli:
+
+  $ heimdall attach http://{{ template "heimdall.fullname" . }}:{{ .Values.svc.heimdallrcp.rest }}

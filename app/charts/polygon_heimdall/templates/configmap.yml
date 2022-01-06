@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "heimdall.fullname" . }}-config
+  labels:
+    app: {{ template "heimdall.name" . }}
+    chart: {{ template "heimdall.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+data:
+  app.toml: |-
+  {{- include (print $.Template.BasePath "/_app.toml") . | nindent 4 }}
+  heimdall-config.toml: |-
+  {{- include (print $.Template.BasePath "/_heimdall-config.toml") . | nindent 4 }}
+  config.toml: |-
+  {{- include (print $.Template.BasePath "/_config.toml") . | nindent 4 }}
+---

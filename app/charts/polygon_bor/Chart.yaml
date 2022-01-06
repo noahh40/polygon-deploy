@@ -1,0 +1,7 @@
+apiVersion: v2
+name: bor
+description: Official Go implementation of the Ethereum protocol
+
+version: "0.2.6"
+appVersion: "0.2.6"
+

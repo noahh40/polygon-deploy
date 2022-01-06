@@ -1,0 +1,10 @@
+.idea
+**/.terraform/*
+**/.terraform.lock.hcl
+**/.terragrunt-cache
+**/terragrunt-debug.tfvars.json
+*.tfstate
+*.tfstate.*
+app/helmfiles
+app/common/helm-charts/pv-provisioner
+**.yaml.dec

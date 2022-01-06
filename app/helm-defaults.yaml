@@ -1,0 +1,6 @@
+helmDefaults:
+  verify: false
+  wait: false
+  recreatePods: false
+  force: false
+  atomic: false

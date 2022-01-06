@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "bor.fullname" . }}-p2p-discovery
+  {{- if .Values.service.annotations }}
+  annotations:
+    {{- .Values.service.annotations | nindent 4 }}
+  {{- end }}
+  labels:
+    app: {{ template "bor.name" . }}
+    chart: {{ template "bor.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  type: LoadBalancer
+  {{- if .Values.service.externalLBp2pDiscoveryIP }}
+  loadBalancerIP: {{ .Values.service.externalLBp2pDiscoveryIP }}
+  {{- end }}
+  ports:
+    - name: networkport-udp
+      port: {{ .Values.networkPort.portUDP }}
+      targetPort: networkport-udp
+      protocol: UDP
+  selector:
+    app: {{ template "bor.name" . }}
+    release: {{ .Release.Name }}

@@ -1,0 +1,50 @@
+{{- tpl (readFile "../../common/repositories.yaml") . | nindent 0 }}
+
+{{- tpl (readFile "../../helm-defaults.yaml") . | nindent 0 }}
+
+environments:
+  eu:
+  {{- tpl (readFile "../../common/templates.yaml") . | nindent 0 }}
+
+releases:
+  - <<: *polyrabbitmq
+    name: rabbitmq
+    namespace: polygon
+    values:
+      - ./values/rabbitmq.yaml
+
+  - <<: *polygon_heimdall
+    name: heimdall
+    namespace: polygon
+    values:
+      - ./values/heimdall.yaml
+      - config_cm:
+          external_address: "35.204.199.215:26656"
+
+  - <<: *polygon_bor
+    name: bor
+    namespace: polygon
+    values:
+      - ./values/bor.yaml
+      - service:
+          type: LoadBalancer
+          externalLBp2pDiscoveryIP: "35.204.199.215"
+          externalLBp2pIP: "35.204.199.215"
+          externalLBIP: "35.204.199.215"
+      - config:
+          nat: "extip:35.204.199.215"
+
+  - <<: *mci
+    name: mci
+    namespace: polygon
+    values:
+      - ./values/mci.yaml
+      - global_ip: 34.120.245.146
+
+  - <<: *mcs
+    name: mcs
+    namespace: polygon
+    values:
+      - ./values/mcs.yaml
+
+context: gke_helix-dev-polygon_europe-west4_polygon-europe-west4-cluster

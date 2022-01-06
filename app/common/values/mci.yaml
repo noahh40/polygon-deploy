@@ -1,0 +1,14 @@
+templates:
+- |
+  apiVersion: networking.gke.io/v1
+  kind: MultiClusterIngress
+  metadata:
+    name: polygon-bor-ingress
+    annotations:
+      networking.gke.io/static-ip: {{ .Values.global_ip }}
+  spec:
+    template:
+      spec:
+        backend:
+          serviceName: polygon-bor-svc
+          servicePort: 8545

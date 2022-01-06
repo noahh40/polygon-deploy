@@ -1,0 +1,148 @@
+image:
+  repository: "maticnetwork/bor"
+  tag: "v0.2.10"
+  pullPolicy: IfNotPresent
+
+proxy:
+  enabled: false
+  http:
+    port: 9545
+  ws:
+    port: 9546
+  otpSecret: "<change-me>"
+  image:
+    pullPolicy: IfNotPresent
+    repository: dysnix/protected-proxy
+    tag: latest
+
+httpRPC:
+  port: 8545
+  api: "eth,net,web3,admin,bor"
+  vhosts: "*"
+wsRPC:
+  port: 8546
+  api: "eth,net,web3,admin,bor"
+  origins: "*"
+networkPort: 
+  portTCP: 30303
+  portUDP: 30303
+
+config_flags:
+  - metrics
+  - http
+  - ws
+  - pprof
+
+config:
+  syncmode: "full"
+  networkid: 137
+  miner.gaslimit: "200000000"
+  miner.gastarget: "20000000"
+  maxpeers: 50
+  cache: 4096 
+  bor.heimdall: "http://polygon-heimdall:1317"
+  datadir: /data
+  pprof.addr: "0.0.0.0"
+  pprof.port: 6060
+  http.addr: "0.0.0.0"
+  http.corsdomain: "*"
+  http.vhosts: "*"
+  ws.addr: "0.0.0.0"
+  nat: "extip:34.141.244.217"
+  # bootnodes: "enode://320553cda00dfc003f499a3ce9598029f364fbb3ed1222fdc20a94d97dcc4d8ba0cd0bfa996579dcc6d17a534741fb0a5da303a90579431259150de66b597251@54.147.31.250:30303" # testnet
+  bootnodes: "enode://0cb82b395094ee4a2915e9714894627de9ed8498fb881cec6db7c65e8b9a5bd7f2f25cc84e71e89d0947e51c76e85d0847de848c7782b13c0255247a6758178c@44.232.55.71:30303,enode://88116f4295f5a31538ae409e4d44ad40d22e44ee9342869e7d68bdec55b0f83c1530355ce8b41fbec0928a7d75a5745d528450d30aec92066ab6ba1ee351d710@159.203.9.164:30303" # mainnet
+
+
+customArgs: {}
+
+fullnameOverride: ""
+nameOverride: ""
+
+service:
+  type: LoadBalancer
+  annotations: {}
+    # service.beta.kubernetes.io/aws-load-balancer-internal: ...
+
+ingress:
+  certmanagerClusterIssuer: letsencrypt-prod
+  enabled: false
+  rpc:
+    proxyHosts:
+    - rpc.example.com
+    hosts:
+    - secret-rpc.example.com
+  ws:
+    proxyHosts:
+    - ws.example.com
+    hosts:
+    - secret-ws.example.com
+
+persistence:
+  # snapshotValue: ""
+  size: 1000Gi
+  # storageClassName: 
+  provisioner: "pd.csi.storage.gke.io"
+  type: pd-ssd
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 1000m
+  #   memory: 2000Mi
+  # requests:
+  #   cpu: 1000m
+  #   memory: 2000Mi
+
+## Autoscaling parameters
+##
+autoscaling:
+  enabled: false
+  # minReplicas: 1
+  # maxReplicas: 10
+  # targetCPU: 50
+  # targetMemory: 50
+
+livenessProbe:
+  enabled: false
+  initialDelaySeconds: 120
+  periodSeconds: 60
+  successThreshold: 1
+  failureThreshold: 3
+  timeoutSeconds: 15
+  exec:
+    command: |
+      - sh
+      - -c
+      - "echo -e 'POST / HTTP/1.1\nHost: localhost:8545\nUser-Agent: curl/7.61.1\nAccept: */*\nContent-Type: application/json\nContent-Length: 60\n\n{\"jsonrpc\":\"2.0\",\"method\":\"net_version\",\"params\":[],\"id\":67}' | nc localhost 8545 | grep -q 'HTTP/1.1 200 OK' && echo -e 'GET / HTTP/1.1\nHost: localhost:8546\nUpgrade: websocket\nConnection: Upgrade\nSec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==\nSec-WebSocket-Version: 13\n' | nc localhost 8546 | grep -q 'HTTP/1.1 101'"
+
+readinessProbe:
+  enabled: false
+  initialDelaySeconds: 60
+  periodSeconds: 60
+  successThreshold: 1
+  failureThreshold: 30
+  timeoutSeconds: 10
+  exec:
+    command: |
+      - sh
+      - -c
+      - "geth {{ if .Values.ropsten }} --ropsten {{ end }} {{ if .Values.rinkeby }} --rinkeby {{ end }} attach --exec '!eth.syncing || eth.syncing.highestBlock-eth.syncing.currentBlock < 100' | grep -q true && return 0 || return 1"
+
+affinity: {}
+
+# nodeSelector: {}
+nodeSelector: {}
+# tolerations: []
+
+tolerations: []
+
+#https://snapshots.matic.today/
+bor:
+  # snapshotUrl: "https://matic-blockchain-snapshots.s3-accelerate.amazonaws.com/matic-mainnet/bor-pruned-snapshot-2021-10-25.tar.gz"
+  genesisUrl: https://raw.githubusercontent.com/maticnetwork/launch/master/mainnet-v1/sentry/sentry/bor/genesis.json
+  snapshotUrl: https://storage.googleapis.com/polygon-snapshots-eu/bor.tgz
+  # genesisUrl: https://raw.githubusercontent.com/maticnetwork/launch/master/testnet-v4/sentry/sentry/bor/genesis.json
+  use_snaphsot: true

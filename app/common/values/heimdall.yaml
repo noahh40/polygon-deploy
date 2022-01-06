@@ -1,0 +1,147 @@
+image:
+  # repository: "maticnetwork/heimdall"
+  # tag: "v0.2.4"
+  repository: "europe-docker.pkg.dev/helix-dev-polygon/polygon-dev/heimdall"
+  tag: "latest"
+  pullPolicy: IfNotPresent
+
+proxy:
+  enabled: false
+  http:
+    port: 9545
+  ws:
+    port: 9546
+  otpSecret: "<change-me>"
+  image:
+    pullPolicy: IfNotPresent
+    repository: dysnix/protected-proxy
+    tag: latest
+
+service:
+  type: LoadBalancer
+  annotations: {}
+    # service.beta.kubernetes.io/aws-load-balancer-internal: ...
+
+svc:
+  heimdalld: 
+    p2p: 26656
+    tcp: 26657
+  heimdallrcp: 
+    rest: 1317
+
+config_flags:
+  - metrics
+  - http
+  - ws
+
+heimdalld:
+  moniker: "heimdallnode"
+
+heimdallrpc:
+  chainId: 
+
+customArgs: {}
+
+fullnameOverride: ""
+nameOverride: ""
+
+ingress:
+  certmanagerClusterIssuer: letsencrypt-prod
+  enabled: false
+  rpc:
+    proxyHosts:
+    - rpc.example.com
+    hosts:
+    - secret-rpc.example.com
+  ws:
+    proxyHosts:
+    - ws.example.com
+    hosts:
+    - secret-ws.example.com
+
+persistence:
+  # snapshotValue: ""
+  # For prod at least 300Gi
+  size: 500Gi
+  # storageClassName: 
+  provisioner: "pd.csi.storage.gke.io"
+  type: pd-ssd
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 1000m
+  #   memory: 2000Mi
+  # requests:
+  #   cpu: 1000m
+  #   memory: 2000Mi
+
+## Autoscaling parameters
+##
+autoscaling:
+  enabled: false
+  # minReplicas: 1
+  # maxReplicas: 10
+  # targetCPU: 50
+  # targetMemory: 50
+
+livenessProbe:
+  enabled: false
+  initialDelaySeconds: 120
+  periodSeconds: 60
+  successThreshold: 1
+  failureThreshold: 3
+  timeoutSeconds: 15
+  exec:
+    command: |
+      - sh
+      - -c
+      - "echo -e 'POST / HTTP/1.1\nHost: localhost:8545\nUser-Agent: curl/7.61.1\nAccept: */*\nContent-Type: application/json\nContent-Length: 60\n\n{\"jsonrpc\":\"2.0\",\"method\":\"net_version\",\"params\":[],\"id\":67}' | nc localhost 8545 | grep -q 'HTTP/1.1 200 OK' && echo -e 'GET / HTTP/1.1\nHost: localhost:8546\nUpgrade: websocket\nConnection: Upgrade\nSec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==\nSec-WebSocket-Version: 13\n' | nc localhost 8546 | grep -q 'HTTP/1.1 101'"
+
+readinessProbe:
+  enabled: false
+  initialDelaySeconds: 60
+  periodSeconds: 60
+  successThreshold: 1
+  failureThreshold: 30
+  timeoutSeconds: 10
+  exec:
+    command: |
+      - sh
+      - -c
+      - "geth {{ if .Values.ropsten }} --ropsten {{ end }} {{ if .Values.rinkeby }} --rinkeby {{ end }} attach --exec '!eth.syncing || eth.syncing.highestBlock-eth.syncing.currentBlock < 100' | grep -q true && return 0 || return 1"
+
+affinity: {}
+
+# nodeSelector: {}
+nodeSelector: {}
+# tolerations: []
+
+tolerations: []
+
+#https://snapshots.matic.today/
+heimdall:
+  # snapshotUrl: "https://matic-blockchain-snapshots.s3-accelerate.amazonaws.com/matic-mumbai/heimdall-snapshot-2021-08-16.tar.gz"
+  snapshotUrl: "https://matic-blockchain-snapshots.s3-accelerate.amazonaws.com/matic-mainnet/heimdall-snapshot-2021-12-20.tar.gz"
+  # genesisUrl: "https://raw.githubusercontent.com/maticnetwork/launch/master/testnet-v4/sentry/sentry/heimdall/config/genesis.json"
+  genesisUrl: "https://raw.githubusercontent.com/maticnetwork/launch/master/mainnet-v1/sentry/sentry/heimdall/config/genesis.json"
+  use_snaphsot: true
+
+heimdall_cm: 
+  eth_rpc_url: "http://geth.ethereum:9545"
+  # amqp_url: "amqp://user:{{.Values.auth.password}}@polyrabbitmq:5672/"
+
+config_cm:
+  tls_cert_file: ""
+  tls_key_file: ""
+  p2p_laddr: "tcp://0.0.0.0:26656"
+  rpc_laddr: "tcp://0.0.0.0:26657"
+  external_address: "34.91.177.149:26656"
+  seeds: "f4f605d60b8ffaaf15240564e58a81103510631c@159.203.9.164:26656,4fb1bc820088764a564d4f66bba1963d47d82329@44.232.55.71:26656,2eadba4be3ce47ac8db0a3538cb923b57b41c927@35.199.4.13:26656,3b23b20017a6f348d329c102ddc0088f0a10a444@35.221.13.28:26656,25f5f65a09c56e9f1d2d90618aa70cd358aa68da@35.230.116.151:26656"
+  addr_book_file: "config/addrbook.json"
+  send_rate: 5120000
+  recv_rate: 5120000
+  allow_duplicate_ip: false

@@ -1,0 +1,45 @@
+templates:
+  polyrabbitmq: &polyrabbitmq
+    chart: bitnami/rabbitmq
+    labels:
+      chart: rabbitmq
+    version: 8.24.2
+    createNamespace: true
+    missingFileHandler: Debug
+    recreatePods: false
+    secrets:
+      - secrets/rabbit.yaml
+    valuesTemplate:
+      - ../common/values/rabbitmq.yaml
+
+  polygon_heimdall: &polygon_heimdall
+    chart: ../../charts/polygon_heimdall/
+    createNamespace: true
+    missingFileHandler: Debug
+    secrets:
+      - secrets/rabbit.yaml
+    valuesTemplate:
+      - ../../common/values/heimdall.yaml
+
+  polygon_bor: &polygon_bor
+    chart: ../../charts/polygon_bor/
+    createNamespace: true
+    missingFileHandler: Debug
+    valuesTemplate:
+      - ../../common/values/bor.yaml
+
+  mci: &mci
+    chart: incubator/raw
+    labels:
+      chart: raw
+    missingFileHandler: Debug
+    valuesTemplate:
+      - ../../common/values/mci.yaml
+
+  mcs: &mcs
+    chart: incubator/raw
+    labels:
+      chart: raw
+    missingFileHandler: Debug
+    valuesTemplate:
+      - ../../common/values/mcs.yaml

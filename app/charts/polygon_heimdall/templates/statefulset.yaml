@@ -1,0 +1,187 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ template "heimdall.fullname" . }}
+  labels:
+    app: {{ template "heimdall.name" . }}
+    chart: {{ template "heimdall.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  serviceName: {{ template "heimdall.name" . }}
+  selector:
+    matchLabels:
+      app: {{ template "heimdall.name" . }}
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "heimdall.name" . }}
+        release: {{ .Release.Name }}
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yml") . | sha256sum }}
+{{- include "heimdall.statefulset.annotations" . | nindent 8 }}
+    spec:
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      initContainers:
+        - name: init
+          command: ["sh", "-c", "test -f /data/config/genesis.json || (/polygon/heimdalld init --home=/data && wget {{ .Values.heimdall.genesisUrl }} -O /data/config/genesis.json )"]
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: Always
+          volumeMounts:
+            - name: data
+              mountPath: /data
+      {{ if .Values.heimdall.use_snaphsot }}
+        - name: snapshot
+          command: ["sh", "-c", "test -f /data/.downloaded || (wget {{ .Values.heimdall.snapshotUrl }}  -O /data/snapshot.tgz  && tar zxvf /data/snapshot.tgz -C /data/data && touch /data/.downloaded )"]
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: Always
+          volumeMounts:
+            - name: data
+              mountPath: /data
+      {{- end }}
+      containers:
+        {{- if .Values.proxy.enabled }}
+        - name: {{ template "heimdall.fullname" . }}-proxy
+          image: "{{ .Values.proxy.image.repository }}:{{ .Values.proxy.image.tag }}"
+          imagePullPolicy: {{ .Values.proxy.image.pullPolicy | quote }}
+          ports:
+          - name: http
+            containerPort: {{ .Values.proxy.http.port }}
+          - name: proxy-ws
+            containerPort: {{ .Values.proxy.ws.port }}
+          env:
+          - name: OTP_SECRET
+            value: {{ .Values.proxy.otpSecret | quote }}
+        {{- end }}
+        - name: {{ template "heimdall.fullname" . }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
+          # command: ["/bin/bash"]
+          # args: ["-c", "sleep 4h"]
+          command: ["/polygon/heimdalld"]
+          args: ["start", "--moniker={{ .Values.heimdalld.moniker }}", "--home=/data"]
+          ports:
+          - name: p2p-rpc
+            containerPort: {{ .Values.svc.heimdalld.p2p }}
+          - name: tcp
+            containerPort: {{ .Values.svc.heimdalld.tcp }}
+          {{- if .Values.livenessProbe.enabled }}
+          livenessProbe:
+            {{- if and .Values.livenessProbe.exec (kindIs "string" .Values.livenessProbe.exec.command) }}
+            {{- omit .Values.livenessProbe "enabled" "exec" | toYaml | nindent 12 }}
+            exec:
+              command:
+                {{- tpl .Values.livenessProbe.exec.command . | nindent 16 }}
+            {{- else }}
+            {{- omit .Values.livenessProbe "enabled" | toYaml | nindent 12 }}
+            {{- end }}
+          {{- end }}
+          {{- if .Values.readinessProbe.enabled }}
+          readinessProbe:
+            {{- if and .Values.readinessProbe.exec (kindIs "string" .Values.readinessProbe.exec.command) }}
+            {{- omit .Values.readinessProbe "enabled" "exec" | toYaml | nindent 12 }}
+            exec:
+              command:
+                {{- tpl .Values.readinessProbe.exec.command . | nindent 16 }}
+            {{- else }}
+            {{- omit .Values.readinessProbe "enabled" | toYaml | nindent 12 }}
+            {{- end }}
+          {{- end }}
+          volumeMounts:
+            - name: data
+              mountPath: /data
+            - name: config
+              mountPath: /data/config/app.toml
+              subPath: app.toml
+            - name: config
+              mountPath: /data/config/config.toml
+              subPath: config.toml
+            - name: config
+              mountPath: /data/config/heimdall-config.toml
+              subPath: heimdall-config.toml
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+        - name: {{ template "heimdall.fullname" . }}-rest
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
+          command: ["/polygon/heimdalld"]
+          args: ["rest-server", "--chain-id={{ .Values.heimdallrpc.chainId }}", "--laddr=tcp://0.0.0.0:1317", "--node=tcp://localhost:26657", "--home=/data" ]
+          ports:
+          - name: http-rpc
+            containerPort: {{ .Values.svc.heimdallrcp.rest }}
+          {{- if .Values.livenessProbe.enabled }}
+          livenessProbe:
+            {{- if and .Values.livenessProbe.exec (kindIs "string" .Values.livenessProbe.exec.command) }}
+            {{- omit .Values.livenessProbe "enabled" "exec" | toYaml | nindent 14 }}
+            exec:
+              command:
+                {{- tpl .Values.livenessProbe.exec.command . | nindent 16 }}
+            {{- else }}
+            {{- omit .Values.livenessProbe "enabled" | toYaml | nindent 12 }}
+            {{- end }}
+          {{- end }}
+          {{- if .Values.readinessProbe.enabled }}
+          readinessProbe:
+            {{- if and .Values.readinessProbe.exec (kindIs "string" .Values.readinessProbe.exec.command) }}
+            {{- omit .Values.readinessProbe "enabled" "exec" | toYaml | nindent 12 }}
+            exec:
+              command:
+                {{- tpl .Values.readinessProbe.exec.command . | nindent 16 }}
+            {{- else }}
+            {{- omit .Values.readinessProbe "enabled" | toYaml | nindent 10 }}
+            {{- end }}
+          {{- end }}
+          volumeMounts:
+          - name: data
+            mountPath: /data
+          - name: config
+            mountPath: /data/config/app.toml
+            subPath: app.toml
+          - name: config
+            mountPath: /data/config/config.toml
+            subPath: config.toml
+          - name: secret
+            mountPath: /data/config/heimdall-config.toml
+            subPath: heimdall-config.toml
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      volumes: 
+        - name: config
+          configMap:
+            name: {{ template "heimdall.fullname" . }}-config
+        - name: secret
+          secret:
+            secretName: {{ template "heimdall.fullname" . }}-secret
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+      annotations:
+        "helm.sh/resource-policy": keep
+      labels:
+        app: {{ template "heimdall.name" . }}
+        chart: {{ template "heimdall.chart" . }}
+        release: {{ .Release.Name }}
+        heritage: {{ .Release.Service }}
+        {{- if .Values.persistence.snapshotValue }}
+        snapshot: {{ .Values.persistence.snapshotValue }}
+        {{- end }}
+    spec:
+      accessModes:
+      - "ReadWriteOnce"
+      storageClassName: premium-rwo
+      resources:
+        requests:
+          storage: {{ .Values.persistence.size | quote }}
+

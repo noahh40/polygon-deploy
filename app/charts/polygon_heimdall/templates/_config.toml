@@ -1,0 +1,83 @@
+log_level= "main:info,state:info,*:error"
+log_format = "plain"
+[consensus]
+create_empty_blocks = true
+create_empty_blocks_interval = "0s"
+peer_gossip_sleep_duration = "100ms"
+peer_query_maj23_sleep_duration = "2s"
+skip_timeout_commit = false
+timeout_commit = "5s"
+timeout_precommit = "1s"
+timeout_precommit_delta = "500ms"
+timeout_prevote = "1s"
+timeout_prevote_delta = "500ms"
+timeout_propose = "3s"
+timeout_propose_delta = "500ms"
+wal_file = "data/cs.wal/wal"
+[fastsync]
+version = "v0"
+[instrumentation]
+max_open_connections = 3
+namespace = "tendermint"
+prometheus = false
+prometheus_listen_addr = ":26660"
+abci = "socket"
+db_backend = "goleveldb"
+db_dir = "data"
+fast_sync = true
+filter_peers = false
+genesis_file = "config/genesis.json"
+node_key_file = "config/node_key.json"
+priv_validator_key_file = "config/priv_validator_key.json"
+priv_validator_laddr = ""
+priv_validator_state_file = "data/priv_validator_state.json"
+prof_laddr = "localhost:6060"
+proxy_app = "tcp://127.0.0.1:26658"
+[mempool]
+broadcast = true
+cache_size = 10000
+max_tx_bytes = 1048576
+max_txs_bytes = 1073741824
+recheck = true
+size = 5000
+wal_dir = ""
+[p2p]
+addr_book_file = "{{ .Values.config_cm.addr_book_file }}"
+addr_book_strict = true
+allow_duplicate_ip = "{{ .Values.config_cm.allow_duplicate_ip }}"
+dial_timeout = "3s"
+external_address = "{{ .Values.config_cm.external_address }}"
+flush_throttle_timeout = "100ms"
+handshake_timeout = "20s"
+laddr = "{{ .Values.config_cm.p2p_laddr }}"
+max_num_inbound_peers = 40
+max_num_outbound_peers = 10
+max_packet_msg_payload_size = 1024
+persistent_peers = ""
+pex = true
+private_peer_ids = ""
+recv_rate = {{ int64 .Values.config_cm.recv_rate }}
+seed_mode = false
+seeds = "{{ .Values.config_cm.seeds }}"
+send_rate = "{{ int64 .Values.config_cm.send_rate }}"
+upnp = false
+[rpc]
+cors_allowed_headers = ["Origin","Accept","Content-Type","X-Requested-With","X-Server-Time",]
+cors_allowed_methods = ["HEAD","GET","POST",]
+cors_allowed_origins = ["*",]
+grpc_laddr = ""
+grpc_max_open_connections = 900
+laddr = "{{ .Values.config_cm.rpc_laddr }}"
+max_body_bytes = 1000000
+max_header_bytes = 1048576
+max_open_connections = 900
+max_subscription_clients = 100
+max_subscriptions_per_client = 5
+timeout_broadcast_tx_commit = "10s"
+tls_cert_file = "{{ .Values.config_cm.tls_cert_file }}"
+tls_key_file = "{{ .Values.config_cm.tls_key_file }}"
+unsafe = false
+[tx_index]
+index_all_tags = true
+index_tags = ""
+indexer = "kv"

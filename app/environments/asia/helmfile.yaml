@@ -1,0 +1,37 @@
+{{- tpl (readFile "../../common/repositories.yaml") . | nindent 0 }}
+
+{{- tpl (readFile "../../helm-defaults.yaml") . | nindent 0 }}
+
+environments:
+  asia:
+  {{- tpl (readFile "../../common/templates.yaml") . | nindent 0 }}
+
+releases:
+  - <<: *polyrabbitmq
+    name: rabbitmq
+    namespace: polygon
+    values:
+      - ./values/rabbitmq.yaml
+
+  - <<: *polygon_heimdall
+    name: heimdall
+    namespace: polygon
+    values:
+      - ./values/heimdall.yaml
+      - config_cm:
+          external_address: "35.221.154.98:26656"
+
+  - <<: *polygon_bor
+    name: bor
+    namespace: polygon
+    values:
+      - ./values/bor.yaml
+      - service:
+          type: LoadBalancer
+          externalLBp2pDiscoveryIP: "35.221.154.98"
+          externalLBp2pIP: "35.221.154.98"
+          externalLBIP: "35.221.154.98"
+      - config:
+          nat: "extip:35.221.154.98"
+
+context: gke_helix-dev-polygon_asia-east1_polygon-asia-east1-cluster

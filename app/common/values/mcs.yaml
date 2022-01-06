@@ -1,0 +1,16 @@
+templates:
+- |
+  apiVersion: networking.gke.io/v1
+  kind: MultiClusterService
+  metadata:
+    name: polygon-bor-svc
+  spec:
+    template:
+      spec:
+        selector:
+          app: bor
+        ports:
+        - name: httprpc
+          protocol: TCP
+          port: 8545
+          targetPort: 8545

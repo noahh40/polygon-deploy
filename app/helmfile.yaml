@@ -1,0 +1,15 @@
+{{- tpl (readFile "common/repositories.yaml") . | nindent 0 }}
+
+{{- tpl (readFile "./helm-defaults.yaml") . | nindent 0 }}
+
+environments:
+  us:
+  asia:
+  eu:
+  mci:
+
+helmfiles:
+  - path: environments/us/helmfile.yaml
+  - path: environments/asia/helmfile.yaml
+  - path: environments/eu/helmfile.yaml
+  - path: environments/mci/helmfile.yaml

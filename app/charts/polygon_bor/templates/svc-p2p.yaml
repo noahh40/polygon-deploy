@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "bor.fullname" . }}-p2p
+  {{- if .Values.service.annotations }}
+  annotations:
+    {{- .Values.service.annotations | nindent 4 }}
+  {{- end }}
+  labels:
+    app: {{ template "bor.name" . }}
+    chart: {{ template "bor.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  type: LoadBalancer
+  {{- if .Values.service.externalLBp2pIP }}
+  loadBalancerIP: {{ .Values.service.externalLBp2pIP }}
+  {{- end }}
+  ports:
+    - name: networkport-tcp
+      port: {{ .Values.networkPort.portTCP }}
+      targetPort: networkport-tcp
+  selector:
+    app: {{ template "bor.name" . }}
+    release: {{ .Release.Name }}
