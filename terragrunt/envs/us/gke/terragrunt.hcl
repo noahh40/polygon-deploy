@@ -32,7 +32,7 @@ locals {
   prefix = "polygon"
   project_id = "helix-dev-polygon"
   vpc_subnetwork = "polygon-us-central1-subnet" // Nice to get it from VPC too
-  kubernetes_version = "1.21.4-gke.2300"
+  # kubernetes_version = "1.21.4-gke.2300"
   machine_type = "e2-standard-8"
   node_locations = "us-central1-a"
 }
@@ -49,7 +49,7 @@ inputs = {
   subnetwork = "${local.vpc_subnetwork}"
   ip_range_pods = "kubernetes-pods-range"
   ip_range_services = "kubernetes-services-range"
-  kubernetes_version = "${local.kubernetes_version}"
+  # kubernetes_version = "${local.kubernetes_version}"
   http_load_balancing = true
   horizontal_pod_autoscaling = true
   network_policy = false
