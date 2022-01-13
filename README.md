@@ -7,6 +7,7 @@ Check minimum and recommended [hardware requirements](https://docs.polygon.techn
 - Terragrun and terraform must be installed before
 - Helmfile and helm must be installed before
 - Also, to store some secrets in safe maner it's necessary to get [helm-secrets plugin installed](https://github.com/jkroepke/helm-secrets/wiki/Installation)
+- gsutil as component of gcloud-sdk
 
 # Solution Deploy
 
@@ -21,9 +22,9 @@ Check minimum and recommended [hardware requirements](https://docs.polygon.techn
     command `gcloud container clusters get-credentials CLUSTER_NAME --region CLUSTER_REGION --project PROJECT_ID`
 2. On step 1 the KMS keyring was created. KMS is encryption service and we have some secrets to encrypt.
     - In case you switched to a new project: please, check paths in `app/.sops.yaml`
-    - In case you switched to a new project: fill files `app/environments/ENV_NAME/secrets/rabbit.yaml.dec` with new secrets (in clear text)
-    - In case you switched to a new project: run `sops --encrypt app/environments/ENV_NAME/secrets/rabbit.yaml.dec > app/environments/ENV_NAME/secrets/rabbit.yaml`\
-        for each Environment to encrypt your fresh secrets. Remove `rabbit.yaml.dec` files to prevent adding it into git.
+    - In case you switched to a new project: fill files `app/environments/ENV_NAME/secrets/rabbit.yaml` with new secrets (see `app/environments/asia/secrets/rabbit.yaml.sample`)
+    - In case you switched to a new project: run `cd app && sops --encrypt environments/ENV_NAME/secrets/rabbit.yaml > environments/ENV_NAME/secrets/rabbit.yaml.enc`\
+        for each Environment to encrypt your fresh secrets. Remove `rabbit.yaml` and rename `rabbit.yaml.enc` to `rabbit.yaml`
     - In case you switched to a new project: retrive external IPs per each zone from `terragrunt` and put it into `helmfile`:
       1. in each dir `terragrunt/envs/ENV_NAME/ips` run `terragrunt output addresses` 
       2. get the IP and replace external IPs in `app/environments/ENV_NAME/helmfile.yaml`
