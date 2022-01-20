@@ -18,18 +18,27 @@ Check minimum and recommended [hardware requirements](https://docs.polygon.techn
     chmod +x helmfile
     sudo mv helmfile /usr/local/bin/helmfile
     ```
-
+8. ['terraform'](https://www.terraform.io/downloads)(Already installed in `CloudShell`)
+9. ['terragrunt'](https://terragrunt.gruntwork.io/docs/getting-started/install/)
+    to install `terragrunt` in `CloudShell` just run this little script:
+    ```
+    wget https://github.com/gruntwork-io/terragrunt/releases/download/v0.35.20/terragrunt_linux_amd64 -O terragrunt 
+    chmod +x terragrunt
+    sudo mv terragrunt /usr/local/bin/terragrunt
+    ```
 # Solution Deploy
 
 ## Step 1: Deploy infra via terragrunt
-0. Open `cloud shell` in your destination GCP project and run command to retrieve your projectID:
+0. Setup all requirements from `Software requirements for deployment` chapter of the doc. Run `gcloud auth login` in case you use `CloudShell`.
+1. In terminal (or if you prefer `CloudShell`) run command to retrieve your projectID:
 ```
 export project_id=`gcloud config get-value project`
 export TF_VAR_project_id=$project_id
+export project=project_id
 ```
-1. Setup all requirements from `Software requirements for deployment` chapter of the doc.
-2. Network plan could be reused, in case you wish to deploy in 3 or less AvailabilityZones
-3. In directory `terragrunt` run command `terrgrunt apply-all` and confirm the changes.
+2. Clone repo `git clone https://github.com/Helix-Technologies/polygon-deploy.git`
+3. Network plan could be reused, in case you wish to deploy in 3 or less AvailabilityZones
+4. In directory `polygon-deploy/terragrunt` run command `terragrunt apply-all` and confirm the changes.
 
 ## Step 2: Deploy the Application via helmfile
 ### Pre-liminary steps

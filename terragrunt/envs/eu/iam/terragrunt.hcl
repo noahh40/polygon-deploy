@@ -17,18 +17,16 @@ dependency "kms" {
   # }
 }
 
-locals {
+inputs = {
   region = "eu-west4"
   prefix = "polygon"
   project_id = "helix-new-polygon"
-}
-
-inputs = {
-  project_id = local.project_id
-  names = ["${local.prefix}-${local.region}-cluster-sa"]
+  # names = ["${prefix}-${region}-cluster-sa"]
+  names = ["polygon-eu-west4-cluster-sa"]
   description = "Cluster SA"
   project_roles = [
-    "${local.project_id}=>roles/storage.objectViewer",
-    "${local.project_id}=>roles/artifactregistry.reader",
+    "dependency.vpc.outputs.project_id=>roles/storage.objectViewer"
+    # "${project_id}=>roles/storage.objectViewer",
+    # "${project_id}=>roles/artifactregistry.reader",
   ]
 }
