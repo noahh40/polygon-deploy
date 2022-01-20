@@ -34,7 +34,6 @@ Check minimum and recommended [hardware requirements](https://docs.polygon.techn
 ```
 export project_id=`gcloud config get-value project`
 export TF_VAR_project_id=$project_id
-export project=project_id
 ```
 2. Clone repo `git clone https://github.com/Helix-Technologies/polygon-deploy.git`
 3. Network plan could be reused, in case you wish to deploy in 3 or less AvailabilityZones
