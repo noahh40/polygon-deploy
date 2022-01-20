@@ -7,6 +7,7 @@ dependency "vpc" {
   mock_outputs = {
     network_name = "vpc-network-name"
   }
+  skip_outputs = true
 }
 
 dependency "kms" {
@@ -19,12 +20,12 @@ dependency "kms" {
 locals {
   region = "eu-west4"
   prefix = "polygon"
-  project_id = "helix-dev-polygon"
+  project_id = "helix-new-polygon"
 }
 
 inputs = {
   project_id = local.project_id
-  names = ["${local.prefix}-${local.region}-cluster1-sa"]
+  names = ["${local.prefix}-${local.region}-cluster-sa"]
   description = "Cluster SA"
   project_roles = [
     "${local.project_id}=>roles/storage.objectViewer",

@@ -7,6 +7,7 @@ dependency "vpc" {
   mock_outputs = {
     network_name = "vpc-network-name"
   }
+  skip_outputs = true
 }
 
 dependency "kms" {
@@ -19,7 +20,7 @@ dependency "kms" {
 locals {
   region = "us-central1"
   prefix = "polygon"
-  project_id = "helix-dev-polygon"
+  project_id = "helix-new-polygon"
 }
 
 inputs = {

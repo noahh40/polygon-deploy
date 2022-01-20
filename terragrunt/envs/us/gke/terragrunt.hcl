@@ -30,7 +30,7 @@ dependency "glb" {
 locals {
   region = "us-central1"
   prefix = "polygon"
-  project_id = "helix-dev-polygon"
+  project_id = "helix-new-polygon"
   vpc_subnetwork = "polygon-us-central1-subnet" // Nice to get it from VPC too
   # kubernetes_version = "1.21.4-gke.2300"
   machine_type = "e2-standard-8"
@@ -39,7 +39,7 @@ locals {
 
 inputs = {
   project_id = "${local.project_id}"
-  name = "${local.prefix}-${local.region}-cluster"
+  name = "${local.prefix}-${local.region}-cluster-gke"
   regional = true
   region = "${local.region}"
   zones = ["${local.region}-a", "${local.region}-b", "${local.region}-c"]
@@ -62,7 +62,7 @@ inputs = {
       max_count = 3
       disk_size_gb = 100
       disk_type = "pd-standard"
-      image_tyyespe = "COS_CONTAINERD"
+      image_tyyespe = "COS"
       auto_repair = true
       auto_upgrade = false
       service_account = dependency.iam.outputs.service_account.email

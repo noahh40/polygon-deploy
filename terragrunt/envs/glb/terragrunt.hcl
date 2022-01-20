@@ -14,8 +14,8 @@ include {
 }
 
 inputs = {
-  project_id = "helix-dev-polygon"
-  network_name = dependency.vpc.outputs.network.network.id
+  project_id = "helix-new-polygon"
+  # network_name = dependency.vpc.outputs.network.network.id
   address_type = "EXTERNAL"
   global = true
   region = "europe-west4" // variable is delared in module, we must provide any value

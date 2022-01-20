@@ -3,13 +3,13 @@ terraform {
   source = "tfr:///terraform-google-modules/network/google?version=4.0.0"
 }
 
-include {
+include "root" {
   path = find_in_parent_folders()
 }
 
 inputs = {
-  project_id = "helix-dev-polygon"
-  network_name = "polygon-dev-vpc-2"
+  project_id = "helix-test-polygon"
+  network_name = "polygon-vpc"
 
   subnets = [
     {

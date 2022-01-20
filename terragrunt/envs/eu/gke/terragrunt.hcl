@@ -30,7 +30,7 @@ dependency "glb" {
 locals {
   region = "europe-west4"
   prefix = "polygon"
-  project_id = "helix-dev-polygon"
+  project_id = "helix-new-polygon"
   vpc_subnetwork = "polygon-europe-west4-subnet"
   # kubernetes_version = "1.21.4-gke.2300"
   machine_type = "e2-standard-8"
@@ -39,7 +39,7 @@ locals {
 
 inputs = {
   project_id = "${local.project_id}"
-  name = "${local.prefix}-${local.region}-cluster"
+  name = "${local.prefix}-${local.region}-cluster-gke"
   regional = true
   region = "${local.region}"
   zones = ["${local.region}-a", "${local.region}-b", "${local.region}-c"]
@@ -86,13 +86,6 @@ inputs = {
 
   node_pools_taints = {
       all = []
-      polygon-node-pool = [
-        {
-          key    = "polygon-node-pool"
-          value  = true
-          effect = "PREFER_NO_SCHEDULE"
-        },
-      ]
     }
 
   node_pools_tags = {

@@ -30,7 +30,7 @@ dependency "glb" {
 locals {
   region = "asia-east1"
   prefix = "polygon"
-  project_id = "helix-dev-polygon"
+  project_id = "helix-new-polygon"
   vpc_subnetwork = "polygon-asia-east1-subnet"
   # kubernetes_version = "1.21.4-gke.2300"
   machine_type = "e2-standard-8"
@@ -39,7 +39,7 @@ locals {
 
 inputs = {
   project_id = "${local.project_id}"
-  name = "${local.prefix}-${local.region}-cluster"
+  name = "${local.prefix}-${local.region}-cluster-gke"
   regional = true
   region = "${local.region}"
   zones = ["${local.region}-a", "${local.region}-b", "${local.region}-c"]

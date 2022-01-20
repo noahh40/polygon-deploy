@@ -14,11 +14,11 @@ include {
 }
 
 inputs = {
-  project_id = "helix-dev-polygon"
-  network_name = "polygon-dev-vpc-2"
+  project_id = "helix-new-polygon"
+  network_name = "polygon-vpc"
 
   location = "global"
-  keyring = "polygon-dev"
+  keyring = "polygon"
   keys    = ["polygon"]
 
 }
