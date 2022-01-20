@@ -23,7 +23,7 @@ dependency "kms" {
 locals {
   region = "asia-east1"
   prefix = "polygon"
-  project_id = "helix-new-polygon"
+  project_id = "${get_env("project_id")}"
 }
 
 inputs = {

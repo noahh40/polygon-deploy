@@ -39,7 +39,7 @@ locals {
 
 inputs = {
   project_id = "${local.project_id}"
-  name = "${local.prefix}-${local.region}-cluster-gke"
+  name = "${local.prefix}-${local.region}-cluster"
   regional = true
   region = "${local.region}"
   zones = ["${local.region}-a", "${local.region}-b", "${local.region}-c"]
