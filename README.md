@@ -42,17 +42,28 @@ export TF_VAR_project_id=$project_id
 ## Step 2: Deploy the Application via helmfile
 ### Pre-liminary steps
 1. From step one you have created a couple GKE clusters up and running. It's time to connect to them by running the \
-    command `gcloud container clusters get-credentials CLUSTER_NAME --region CLUSTER_REGION --project PROJECT_ID`
+    command `gcloud container clusters get-credentials CLUSTER_NAME --region REGION --project $project_id`
+    `REGION` by default we have 3 of them: 
+        - asia-east1
+        - europe-west4
+        - us-central1
+    `CLUSTER_NAME` is looks like `polygon-${REGION}-cluster`, so to get connection to all 3 GKE cluster run this command:
+    ```
+    gcloud container clusters get-credentials polygon-europe-west4-cluster --region europe-west4 --project $project_id
+    gcloud container clusters get-credentials polygon-us-central1-cluster --region us-central1 --project $project_id
+    gcloud container clusters get-credentials polygon-asia-east1-cluster --region asia-east1 --project $project_id
+    ```
+    
 2. On step 1 the KMS keyring was created. KMS is encryption service and we have some secrets to encrypt.
-    - In case you switched to a new project: please, check paths in `app/.sops.yaml`
-    - In case you switched to a new project: fill files `app/environments/ENV_NAME/secrets/rabbit.yaml` with new secrets (see `app/environments/asia/secrets/rabbit.yaml.sample`)
-    - In case you switched to a new project: run `cd app && sops --encrypt environments/ENV_NAME/secrets/rabbit.yaml > environments/ENV_NAME/secrets/rabbit.yaml.enc`\
+    - In case you switched to a new project: please, put `$project_id` paths in `app/.sops.yaml`
+    - In case you switched to a new project: fill files `app/environments/REGION/secrets/rabbit.yaml` with new secrets (see `app/environments/asia/secrets/rabbit.yaml.sample` to get full sample for this kind of files.)
+    - In case you switched to a new project: run `cd app && sops --encrypt environments/REGION/secrets/rabbit.yaml > environments/REGION/secrets/rabbit.yaml.enc`\
         for each Environment to encrypt your fresh secrets. Remove `rabbit.yaml` and rename `rabbit.yaml.enc` to `rabbit.yaml`
     - In case you switched to a new project: retrive external IPs per each zone from `terragrunt` and put it into `helmfile`:
-      1. in each dir `terragrunt/envs/ENV_NAME/ips` run `terragrunt output addresses` 
-      2. get the IP and replace external IPs in `app/environments/ENV_NAME/helmfile.yaml`
+      1. in each dir `terragrunt/envs/REGION/ips` run `terragrunt output addresses` 
+      2. get the IP and replace external IPs in `app/environments/REGION/helmfile.yaml`
       3. there is a separate IP for Global Load Balancer. To get it run terragrunt output addresses` in `terragrunt/envs/glb`
       4. put GLB address into `app/environments/eu/helmfile.yaml` as value for `global_ip: ` parameter in `mci` release
-      5. also, put your `kubectl` context for appropriate cluster in `app/environments/ENV_NAME/helmfile.yaml` as value for `context:`
+      5. run `kubectl config get-contexts -o name` and put context for appropriate cluster in `app/environments/REGION/helmfile.yaml` as value for `context:`
 3. It's time to run deployment of our nodes. In `app/environments/` run `helmfile sync`. \
     In case you wish to deploy zone-by-zone you can execute helmfile in same ditectory with additional key like `helmfile -e eu sync`
