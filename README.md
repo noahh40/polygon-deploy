@@ -2,7 +2,7 @@
 In this document we will describe how to deploy Polygon nodes onto Google Kubernetes Engine clusters
 
 ## Hardware requirements
-Check minimum and recommended [hardware requirements](https://docs.polygon.technology/docs/validate/mainnet/validator-guide) in Polygon docs
+Check minimum and recommended [hardware requirements](https://docs.polygon.technology/docs/validate/validate/validator-node-system-requirements) in Polygon docs
 
 ## Software requirements for deployment
 1. Linux terminal (or you can run through this via `CloudShell`. Currently, it's debian10 and x86_64 architecture )
