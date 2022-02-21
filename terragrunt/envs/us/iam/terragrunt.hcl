@@ -19,7 +19,7 @@ dependency "kms" {
 locals {
   region = "us-central1"
   prefix = "polygon"
-  project_id = "helix-dev-polygon"
+  project_id = "helix-dev-polygon-342021"
 }
 
 inputs = {

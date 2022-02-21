@@ -34,4 +34,4 @@ releases:
       - config:
           nat: "extip:104.198.196.160"
 
-context: gke_helix-dev-polygon_us-central1_polygon-us-central1-cluster
+context: gke_helix-dev-polygon-342021_us-central1_polygon-us-central1-cluster

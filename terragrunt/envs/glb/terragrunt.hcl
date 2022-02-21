@@ -14,7 +14,7 @@ include {
 }
 
 inputs = {
-  project_id = "helix-dev-polygon"
+  project_id = "helix-dev-polygon-342021"
   network_name = dependency.vpc.outputs.network.network.id
   address_type = "EXTERNAL"
   global = true

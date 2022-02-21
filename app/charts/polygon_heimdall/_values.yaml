@@ -1,5 +1,5 @@
 image:
-  repository: "europe-docker.pkg.dev/helix-dev-polygon/polygon-dev/heimdall"
+  repository: "europe-docker.pkg.dev/helix-dev-polygon-342021/polygon-dev/heimdall"
   tag: "latest"
   pullPolicy: IfNotPresent
 

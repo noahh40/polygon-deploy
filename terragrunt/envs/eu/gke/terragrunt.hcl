@@ -30,7 +30,7 @@ dependency "glb" {
 locals {
   region = "europe-west4"
   prefix = "polygon"
-  project_id = "helix-dev-polygon"
+  project_id = "helix-dev-polygon-342021"
   vpc_subnetwork = "polygon-europe-west4-subnet"
   # kubernetes_version = "1.21.4-gke.2300"
   machine_type = "e2-standard-8"

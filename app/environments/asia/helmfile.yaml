@@ -34,4 +34,4 @@ releases:
       - config:
           nat: "extip:35.221.154.98"
 
-context: gke_helix-dev-polygon_asia-east1_polygon-asia-east1-cluster
+context: gke_helix-dev-polygon-342021_asia-east1_polygon-asia-east1-cluster

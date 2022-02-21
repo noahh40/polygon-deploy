@@ -47,4 +47,4 @@ releases:
     values:
       - ./values/mcs.yaml
 
-context: gke_helix-dev-polygon_europe-west4_polygon-europe-west4-cluster
+context: gke_helix-dev-polygon-342021_europe-west4_polygon-europe-west4-cluster

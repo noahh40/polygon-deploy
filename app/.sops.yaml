@@ -1,7 +1,7 @@
 creation_rules:
   - path_regex: environments/asia/secrets(/)?.*\.yaml(.dec)?$
-    gcp_kms: projects/helix-dev-polygon/locations/global/keyRings/polygon-dev/cryptoKeys/polygon
+    gcp_kms: projects/helix-dev-polygon-342021/locations/global/keyRings/polygon-dev/cryptoKeys/polygon
   - path_regex: environments/eu/secrets(/)?.*\.yaml(.dec)?$
-    gcp_kms: projects/helix-dev-polygon/locations/global/keyRings/polygon-dev/cryptoKeys/polygon
+    gcp_kms: projects/helix-dev-polygon-342021/locations/global/keyRings/polygon-dev/cryptoKeys/polygon
   - path_regex: environments/us/secrets(/)?.*\.yaml(.dec)?$
-    gcp_kms: projects/helix-dev-polygon/locations/global/keyRings/polygon-dev/cryptoKeys/polygon
+    gcp_kms: projects/helix-dev-polygon-342021/locations/global/keyRings/polygon-dev/cryptoKeys/polygon
